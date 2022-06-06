@@ -1,9 +1,11 @@
 from ast import Try
+from distutils.log import error
+from operator import indexOf
 from turtle import fd
 import telebot
 from telebot import types
  
-API = ""
+API = 'BotFather API'
 print(API)
 bot = telebot.TeleBot(API, parse_mode=None)
 
@@ -48,20 +50,15 @@ def send_buttons(message):
 @bot.message_handler(func = lambda msg:'@Polygon_Support_TestBot' in msg.text)
 def send_support(message):
     try:
-        if(message.chat.id == 'here chat id'):
-            groupid= 1
-        elif(message.chat.id == 'here chat id'):
-            groupid= 2
-
-        if(message.chat.id == 'here chat id' or message.chat.id == 'here chat id'):
+        if(message.chat.id == 'chat id' or message.chat.id == 'chat id'):
             msgid= message.message_id
             name= message.from_user.first_name + " " + message.from_user.last_name + " ( @" + message.from_user.username + " )"
             groupname= message.chat.title + " ( @" + message.chat.username +" )"
             msgtext= (message.text).replace('@Polygon_Support_TestBot','')
 
-            msg= "\nUserInfo"+ "\nfrom- " + str(groupname) + "\nname- " + name + "\nmsgid- "+str(msgid)+"\ngroupid- #" + str(groupid)
+            msg= "\nUserInfo"+ "\nfrom: " + str(groupname) + "\nname: " + name + "\nmsgid: "+str(msgid)+"\ngroupid: " + str(message.chat.id)
             forward_msg= "Query: "+ msgtext + "\n" + msg
-            bot.send_message('here chat id', forward_msg)
+            bot.send_message('receiver group chat id', forward_msg)
             bot.reply_to(message,"Query sents to polygon team,wait for response!!")
             # time.sleep(5)
             # bot.delete_message(cid,msgid+1)
@@ -70,38 +67,35 @@ def send_support(message):
     except:
         bot.reply_to(message, "failed to send")
 
-@bot.message_handler(func = lambda msg:'#replyid' in msg.text)
-def send_setid(message):
-    global msgid
-    try:
-        if message.from_user.id == 'here user id':
-            msgtext= (message.text).lstrip('#replyid ')
-            msgid = int(msgtext)
-            bot.reply_to(message, "MessageId set for reply: " + str(msgid))
-        else:
-            bot.reply_to(message, "only admin have right to set messageId")
-    except:
-        bot.reply_to(message,"wrong input!! please try in right way #replyid <msgid>")
 
-@bot.message_handler(func = lambda msg:'#reply' in msg.text)
-def send_reply(message):
-    global msgid
-    if('#1' in message.text):
-        groupid= 'here chat id'
-        msgtext= (message.text).lstrip("#reply #1 ")
-    elif('#2' in message.text):
-        groupid= 'here chat id'
-        msgtext= (message.text).lstrip("#reply #2 ")
+@bot.message_handler(func=lambda msg: '' in  msg.text)
+def send_reply_(message):
     try:
-        if message.from_user.id == 'here user id':
-            global msgid
-            replytext= "Reply from polygon team:\n\n" + msgtext
-            bot.send_message(groupid,replytext,reply_to_message_id=msgid)
-            bot.reply_to(message, "Reply sent, messageId: " + str(msgid))
-        else:
-            bot.reply_to(message, "only admin have right to reply")  
-    except: 
-        bot.reply_to(message, "Failed to reply!!")
+        if(message.reply_to_message and message.chat.id == 'chat id'):
+            msg= message.reply_to_message.text
+
+            # to get msgid from message
+            msgIndex= msg.index('msgid')
+            msgIndex=msgIndex+7
+            msgid= str()
+            while msg[msgIndex] != '\n':
+                msgid= msgid+msg[msgIndex]
+                msgIndex = msgIndex+1
+        
+            # to get groupid from message
+            groupIndex = msg.index('groupid')
+            groupIndex = groupIndex + 9
+            groupId= str()
+            while groupIndex<len(msg):
+                groupId = groupId+msg[groupIndex]
+                groupIndex = groupIndex +1
+
+            replytext= "Reply from polygon team:\n\n" + message.text
+            bot.send_message(groupId,replytext,reply_to_message_id=msgid)
+            bot.reply_to(message, "Reply sent")
+    except Exception as e:
+        bot.reply_to(message, "Error: " + str(e))
+
 
 @bot.message_handler(func=lambda msg: '/' in msg.text)
 def repeat(message):
