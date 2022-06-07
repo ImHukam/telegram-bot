@@ -14,3 +14,4 @@ print(input_range)
 
 # wks.update('A3:A7',[['HELLO','TEST','3','4','5','6']])
 wks.update(input_range, [['HELLO','HELLO','this is good','2','3','3']])
+# wks.clear()
